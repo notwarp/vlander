@@ -14,7 +14,7 @@
 ## Built With
 
 - Python 3.9.2
-- Blender 3D 2.95.3
+- Blender 3D 2.93.5
 
 ## Future Updates
 
