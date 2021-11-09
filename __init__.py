@@ -13,9 +13,9 @@ bl_info = {
     'blender': (2, 90, 0),
     'location': 'View3D > Header',
     'warning': '',
-    'doc_url': 'https://github.com/s-leger/vlander/wiki',
-    'tracker_url': 'https://github.com/s-leger/vlander/issues',
-    'link': 'https://github.com/s-leger/vlander',
+    'doc_url': 'https://github.com/notwarp/vlander/wiki',
+    'tracker_url': 'https://github.com/notwarp/vlander/issues',
+    'link': 'https://github.com/notwarp/vlander',
     'support': 'COMMUNITY',
     'category': 'View 3D'
 }
