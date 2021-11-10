@@ -21,38 +21,28 @@ bl_info = {
 }
 
 if "bpy" in locals():
-    import importlib as imp
+    from importlib import reload
 
-    imp.reload(vlander_settings)
-    settings = vlander_settings.VlanderSettings()
-    imp.reload(vlander_menu)
-    vlander_menu.settings = settings
+    # alphabetically sorted all add-on modules since reload only happens from __init__.
+    # modules with _bg are used for background computations in separate blender instance and that's why they don't need reload.
+
+    icons = reload(icons)
+    main_panel = reload(main_panel)
 
 else:
-    from . import vlander_settings
-    settings = vlander_settings.VlanderSettings()
-    from . import vlander_menu
-    vlander_menu.settings = settings
+    from vlander import icons
+    from vlander import main_panel
 
-# noinspection PyUnresolvedReferences
-import bpy
-# noinspection PyUnresolvedReferences
 from bpy.types import (
     Panel, WindowManager, PropertyGroup,
     AddonPreferences, Menu
 )
 from bpy.props import (
-    EnumProperty, PointerProperty,
-    StringProperty, BoolProperty,
-    IntProperty, FloatProperty, FloatVectorProperty
+    BoolProperty, IntProperty
 )
 
-# ----------------------------------------------------
-# Addon preferences
-# ----------------------------------------------------
 
-
-class Vlander_Pref(AddonPreferences):
+class VlanderPref(AddonPreferences):
     bl_idname = __name__
     settings = {}
     auto_fetch: BoolProperty(
@@ -91,8 +81,11 @@ class Vlander_Pref(AddonPreferences):
         row = box.row()
         col = row.column()
         col.prop(self, "auto_fetch",
-                 icon_value=settings.icons_collection['main']['git-white'].icon_id)
-        col.prop(self, "get_beta", icon_value=settings.icons_collection['main']['git'].icon_id)
+                 icon_value=icons.icon_collections['main']['git-white'].icon_id
+                 )
+        col.prop(self, "get_beta",
+                 icon_value=icons.icon_collections['main']['git'].icon_id
+                 )
 
         col = split.column()
         box = col.box()
@@ -105,25 +98,37 @@ class Vlander_Pref(AddonPreferences):
         col.prop(self, "use_experimental", icon='ERROR')
 
 
-settings.VLANDER_classes += [Vlander_Pref]
+class VlanderRatingProps(PropertyGroup):
+    rating_quality: IntProperty(name="Quality",
+                                description="quality of the material",
+                                default=0,
+                                min=-1, max=10,
+                                # update=ratings_utils.update_ratings_quality
+                                )
 
-# ----------------------------------------------------
-# Add imported classes in VLANDER_classes array
-# ----------------------------------------------------
 
-settings.VLANDER_classes += [vlander_menu.VIEW3D_PT_Vlander_menu]
+classes = [
+    VlanderPref,
+    VlanderRatingProps
+]
+
+import bpy
 
 
 def register():
-    settings.setup()
-    for cls in settings.VLANDER_classes:
+    # settings.setup()
+    for cls in classes:
         bpy.utils.register_class(cls)
+    icons.register_icons()
+    main_panel.register_main_panel()
 
 
 def unregister():
-    for cls in reversed(settings.VLANDER_classes):
+    main_panel.unregister_main_panel()
+    icons.unregister_icons()
+    for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
-    settings.destroy()
+    # settings.destroy()
 
 
 if __name__ == "__main__":
