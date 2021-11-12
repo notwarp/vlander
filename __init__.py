@@ -23,22 +23,28 @@ bl_info = {
 if "bpy" in locals():
     from importlib import reload
 
-    # alphabetically sorted all add-on modules since reload only happens from __init__.
-    # modules with _bg are used for background computations in separate blender instance and that's why they don't need reload.
+    # alphabetically sorted all add-on modules since reload only happens from __init__. modules with _bg are used for
+    # background computations in separate blender instance and that's why they don't need reload.
 
     icons = reload(icons)
     main_panel = reload(main_panel)
+    vlander_menus = reload(vlander_menus)
+    vlander_opts = reload(vlander_opts)
+    vlander_panels = reload(vlander_panels)
+    vlander_props = reload(vlander_props)
 
 else:
-    from vlander import icons
-    from vlander import main_panel
+    from . import vlander_props
+    from . import vlander_opts
+    from . import vlander_panels
+    from . import vlander_menus
+    from . import icons
 
 from bpy.types import (
-    Panel, WindowManager, PropertyGroup,
-    AddonPreferences, Menu
+    AddonPreferences
 )
 from bpy.props import (
-    BoolProperty, IntProperty
+    BoolProperty
 )
 
 
@@ -98,38 +104,33 @@ class VlanderPref(AddonPreferences):
         col.prop(self, "use_experimental", icon='ERROR')
 
 
-class VlanderRatingProps(PropertyGroup):
-    rating_quality: IntProperty(name="Quality",
-                                description="quality of the material",
-                                default=0,
-                                min=-1, max=10,
-                                # update=ratings_utils.update_ratings_quality
-                                )
-
-
 classes = [
-    VlanderPref,
-    VlanderRatingProps
+    VlanderPref
 ]
-
-import bpy
 
 
 def register():
-    # settings.setup()
+    from bpy.utils import register_class
     for cls in classes:
-        bpy.utils.register_class(cls)
+        register_class(cls)
+    vlander_opts.register_opts()
+    vlander_props.register_props()
+    vlander_panels.register_panels()
+    vlander_menus.register_menus()
     icons.register_icons()
-    main_panel.register_main_panel()
 
 
 def unregister():
-    main_panel.unregister_main_panel()
+    from bpy.utils import unregister_class
     icons.unregister_icons()
+    vlander_menus.unregister_menus()
+    vlander_panels.unregister_panels()
+    vlander_props.unregister_props()
+    vlander_opts.unregister_opts()
     for cls in reversed(classes):
-        bpy.utils.unregister_class(cls)
-    # settings.destroy()
+        unregister_class(cls)
 
 
 if __name__ == "__main__":
     register()
+

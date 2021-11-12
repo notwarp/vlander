@@ -26,7 +26,9 @@ icon_collections = {}
 
 icons_read = {
     'git.png': 'git',
-    'git-white.png': 'git-white'
+    'git-white.png': 'git-white',
+    'vlander.png': 'vlander',
+    'vlander-white.png': 'vlander-white'
 }
 
 verification_icons = {
