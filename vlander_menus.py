@@ -17,7 +17,6 @@ class VIEW3D_MT_Vlander_menu(Menu):
         return context.scene.world.vlander.is_active
 
     def draw(self, context):
-        print('draw menu')
         layout = self.layout
         layout.operator("vlander.clean", text="Clean", icon='REMOVE')
         layout.operator("vlander.create", text="Create", icon='ADD')

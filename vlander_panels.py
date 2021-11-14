@@ -14,10 +14,6 @@ class PROPERTIES_PT_Vlander_panel(Panel):
     bl_region_type = "WINDOW"
     bl_context = "world"
 
-    # @classmethod
-    # def poll(cls, context):
-    #     return context.scene.world.vlander.is_active
-
     def draw_header(self, context):
         if context.area.type == 'PROPERTIES':
             # Example property to display a checkbox, can be anything
@@ -40,6 +36,7 @@ class PROPERTIES_PT_Vlander_panel(Panel):
         layout.label(text='Vlander Properties')
         row = layout.row()
         row.operator("vlander.create", text="Create", icon_value=icons.icon_collections['main']['vlander'].icon_id)
+        row.operator("vlander.clean", text="Clean", icon_value=icons.icon_collections['main']['vlander-white'].icon_id)
 
 
 classes = [
@@ -53,12 +50,6 @@ def header_panel_draw(self, context):
         row = layout.row()
         if bpy.app.version[0] == 2:
             row.separator_spacer()
-        # row.prop(
-        #     context.scene.world.vlander,
-        #     'is_active',
-        #     icon_only=True,
-        #     icon_value=icons.icon_collections['main']['git-white'].icon_id
-        # )
         row.popover(
             "PROPERTIES_PT_Vlander_panel",
             text=''
