@@ -20,14 +20,12 @@ bl_info = {
     'category': 'View 3D'
 }
 
-if "bpy" in locals():
+if "vlander_props" in locals():
     from importlib import reload
-
     # alphabetically sorted all add-on modules since reload only happens from __init__. modules with _bg are used for
     # background computations in separate blender instance and that's why they don't need reload.
 
     icons = reload(icons)
-    main_panel = reload(main_panel)
     vlander_menus = reload(vlander_menus)
     vlander_opts = reload(vlander_opts)
     vlander_panels = reload(vlander_panels)

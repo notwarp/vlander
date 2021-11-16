@@ -3,7 +3,9 @@
 #
 # ----------------------------------------------------------
 import bpy
-from bpy.types import Menu
+from bpy.types import (
+    Menu
+)
 from . import icons
 
 
