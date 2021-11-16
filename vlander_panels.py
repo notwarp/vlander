@@ -10,6 +10,28 @@ from bpy.types import (
 from . import icons
 
 
+def draw_vlander_settings(context, layout):
+    if context.area.type == 'PROPERTIES':
+        layout.prop(context.scene.world.vlander, 'dimension')
+        layout.prop(context.scene.world.vlander, 'resolution')
+
+
+def draw_vlander_actions(context, col):
+    if not context.scene.world.vlander.created:
+        draw_vlander_settings(context, col)
+        col.operator(
+            "vlander.create",
+            text="Create",
+            icon_value=icons.icon_collections['main']['vlander'].icon_id
+        )
+    else:
+        col.operator(
+            "vlander.clean",
+            text="Clean",
+            icon_value=icons.icon_collections['main']['vlander-white'].icon_id
+        )
+
+
 class PROPERTIES_PT_Vlander_panel(Panel):
     bl_label = f'Vlander'
     bl_idname = "PROPERTIES_PT_Vlander_panel"
@@ -19,7 +41,6 @@ class PROPERTIES_PT_Vlander_panel(Panel):
 
     def draw_header(self, context):
         if context.area.type == 'PROPERTIES':
-            # Example property to display a checkbox, can be anything
             self.layout.prop(
                 context.scene.world.vlander,
                 'is_active',
@@ -36,11 +57,9 @@ class PROPERTIES_PT_Vlander_panel(Panel):
     def draw(self, context):
         layout = self.layout
         layout.enabled = context.scene.world.vlander.is_active
-        layout.label(text='Vlander Properties')
-        row = layout.row()
-        row.operator("vlander.create", text="Create", icon_value=icons.icon_collections['main']['vlander'].icon_id)
-        row = layout.row()
-        row.operator("vlander.clean", text="Clean", icon_value=icons.icon_collections['main']['vlander-white'].icon_id)
+        layout.label(text='Vlander Actions')
+        col = layout.column()
+        draw_vlander_actions(context, col)
 
 
 class Vlander(WorkSpaceTool):
@@ -56,34 +75,21 @@ class Vlander(WorkSpaceTool):
         "This is a tooltip\n"
         "with multiple lines"
     )
-    bl_keymap = (
-        ("vlander.mode", {"type": "MOUSEMOVE", "value": "ANY"}, None),
-    )
+    bl_keymap = None
 
-    # def draw_settings(context, layout, tool):
-    #     layout.prop(
-    #         context.scene.world.vlander,
-    #         'is_active',
-    #         icon_only=True,
-    #         icon_value=icons.icon_collections['main']['vlander-white'].icon_id
-    #     )
+    def draw_settings(context, layout, tool):
+        layout.prop(
+            context.scene.world.vlander,
+            'is_active',
+            icon_only=True,
+            icon_value=icons.icon_collections['main']['vlander-white'].icon_id
+        )
+        draw_vlander_actions(context, layout)
 
 
 classes = [
     PROPERTIES_PT_Vlander_panel
 ]
-
-
-def header_panel_draw(self, context):
-    layout = self.layout
-    if context.mode in {'EDIT_MESH', 'OBJECT'}:
-        row = layout.row()
-        if bpy.app.version[0] == 2:
-            row.separator_spacer()
-        row.popover(
-            "PROPERTIES_PT_Vlander_panel",
-            text=''
-        )
 
 
 def register_panels():
@@ -92,20 +98,13 @@ def register_panels():
     )
     for c in classes:
         register_class(c)
-    if bpy.app.version[0] == 2:
-        bpy.types.VIEW3D_MT_editor_menus.append(header_panel_draw)
-    else:
-        bpy.types.VIEW3D_HT_tool_header.prepend(header_panel_draw)
     register_tool(Vlander)
+
 
 def unregister_panels():
     from bpy.utils import (
         unregister_class, unregister_tool
     )
-    if bpy.app.version[0] == 2:
-        bpy.types.VIEW3D_MT_editor_menus.remove(header_panel_draw)
-    else:
-        bpy.types.VIEW3D_HT_tool_header.remove(header_panel_draw)
     for c in reversed(classes):
         unregister_class(c)
     unregister_tool(Vlander)

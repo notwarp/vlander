@@ -26,7 +26,7 @@ if "vlander_props" in locals():
     # background computations in separate blender instance and that's why they don't need reload.
 
     icons = reload(icons)
-    vlander_menus = reload(vlander_menus)
+    draw = reload(draw)
     vlander_opts = reload(vlander_opts)
     vlander_panels = reload(vlander_panels)
     vlander_props = reload(vlander_props)
@@ -35,8 +35,8 @@ else:
     from . import vlander_props
     from . import vlander_opts
     from . import vlander_panels
-    from . import vlander_menus
     from . import icons
+    from . import draw
 
 from bpy.types import (
     AddonPreferences
@@ -114,14 +114,12 @@ def register():
     vlander_opts.register_opts()
     vlander_props.register_props()
     vlander_panels.register_panels()
-    vlander_menus.register_menus()
     icons.register_icons()
 
 
 def unregister():
     from bpy.utils import unregister_class
     icons.unregister_icons()
-    vlander_menus.unregister_menus()
     vlander_panels.unregister_panels()
     vlander_props.unregister_props()
     vlander_opts.unregister_opts()
