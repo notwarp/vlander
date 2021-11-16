@@ -57,17 +57,16 @@ class Vlander(WorkSpaceTool):
         "with multiple lines"
     )
     bl_keymap = (
-        ("vlander.create", {"type": 'LEFTMOUSE', "value": 'PRESS'},
-         {"properties": [("test", False)]}),
+        ("vlander.mode", {"type": "MOUSEMOVE", "value": "ANY"}, None),
     )
 
-    def draw_settings(context, layout, tool):
-        layout.prop(
-            context.scene.world.vlander,
-            'is_active',
-            icon_only=True,
-            icon_value=icons.icon_collections['main']['vlander-white'].icon_id
-        )
+    # def draw_settings(context, layout, tool):
+    #     layout.prop(
+    #         context.scene.world.vlander,
+    #         'is_active',
+    #         icon_only=True,
+    #         icon_value=icons.icon_collections['main']['vlander-white'].icon_id
+    #     )
 
 
 classes = [

@@ -84,6 +84,11 @@ class VlanderWorldProperties(PropertyGroup):
         default=False,
         update=update_vlander_activation
     )
+    is_mode: BoolProperty(
+        name='Is in active Mode',
+        description='Vlander System Modal',
+        default=False
+    )
     dim: IntProperty(
         name="dimension",
         description="Vlander Dimension",

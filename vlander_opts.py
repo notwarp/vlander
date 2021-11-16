@@ -6,7 +6,7 @@
 import bpy
 from bpy.types import Operator
 from bpy.props import (
-    BoolProperty, IntProperty
+    BoolProperty, IntProperty, StringProperty
 )
 
 
@@ -22,6 +22,7 @@ class VLANDER_OT_create(Operator):
         return True
 
     def execute(self, context):
+        self.invoke(context, None)
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -47,6 +48,23 @@ class VLANDER_OT_clean(Operator):
         if context.mode == "OBJECT":
             # TODO create all
             pass
+        return {'FINISHED'}
+
+
+# Hack for call creation clicking on WorkSpaceTool button Vlander
+# Should we investigate to find a better solution
+class VLANDER_OT_mode(Operator):
+    """Set Vlander Active"""
+    bl_idname = "vlander.mode"
+    bl_label = "Mode"
+    bl_description = "Mode"
+
+    def invoke(self, context, event):
+        if not context.scene.world.vlander.is_mode:
+            context.scene.world.vlander.is_active = True
+            context.scene.world.vlander.is_mode = True
+            bpy.ops.vlander.create()
+            context.area.tag_redraw()
         return {'FINISHED'}
 
 
@@ -98,8 +116,9 @@ class VLANDER_OT_chosetypes(Operator):
 
 cls = [
     VLANDER_OT_create,
+    VLANDER_OT_mode,
     VLANDER_OT_clean,
-    VLANDER_OT_chosetypes,
+    VLANDER_OT_chosetypes
 ]
 
 
