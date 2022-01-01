@@ -17,8 +17,8 @@ def draw_vlander_settings(context, layout):
 
 
 def draw_vlander_actions(context, col):
+    draw_vlander_settings(context, col)
     if not context.scene.world.vlander.created:
-        draw_vlander_settings(context, col)
         col.operator(
             "vlander.create",
             text="Create",

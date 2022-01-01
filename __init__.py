@@ -27,6 +27,7 @@ if "vlander_props" in locals():
 
     icons = reload(icons)
     draw = reload(draw)
+    geometry = reload(geometry)
     vlander_opts = reload(vlander_opts)
     vlander_panels = reload(vlander_panels)
     vlander_props = reload(vlander_props)
@@ -37,6 +38,7 @@ else:
     from . import vlander_panels
     from . import icons
     from . import draw
+    from . import geometry
 
 from bpy.types import (
     AddonPreferences

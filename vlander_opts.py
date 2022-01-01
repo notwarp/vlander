@@ -19,12 +19,11 @@ class VLANDER_OT_create(Operator):
 
     @classmethod
     def poll(cls, context):
-        return not context.scene.world.vlander.created
+        return context.scene.world.vlander.is_active
 
     # called when clicked on button create
     def invoke(self, context, event):
         if context.mode == "OBJECT":
-            context.scene.world.vlander.is_active = True
             context.scene.world.vlander.created = True
         return {'FINISHED'}
 
@@ -43,7 +42,6 @@ class VLANDER_OT_clean(Operator):
     def invoke(self, context, event):
         if context.mode == "OBJECT":
             context.scene.world.vlander.created = False
-            pass
         return {'FINISHED'}
 
 

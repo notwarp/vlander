@@ -4,7 +4,7 @@
 # ----------------------------------------------------------
 from bpy.types import PropertyGroup
 from bpy.props import (
-    BoolProperty, IntProperty
+    BoolProperty, IntProperty, CollectionProperty
 )
 from . import draw
 from bpy.types import World
@@ -27,7 +27,8 @@ class VlanderWorldProperties(PropertyGroup):
         description="Vlander Dimension",
         default=6,
         max=100,
-        min=6
+        min=6,
+        update=draw.update_vlander_creation
     )
     resolution: IntProperty(
         name="resolution",
