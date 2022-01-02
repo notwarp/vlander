@@ -1,3 +1,6 @@
+import random
+
+
 def square_grid_diagonal(dimension):
     distance = 10
     coordinates = []
@@ -11,13 +14,13 @@ def square_grid_diagonal(dimension):
     return coordinates
 
 
-def square_grid_zigzag(dimension, distance):
+def square_grid_zigzag(dimension, resolution):
     coords = []
     distance = 10
     offset = (dimension / 2 - 0.5) * distance
     for x in range(dimension):
         for j in range(dimension):
-            coords.append((j * distance - offset, x * distance - offset, 0))
+            coords.append((j * distance - offset, x * distance - offset, random.randrange(0, 3)))
     return coords
 
 
@@ -77,7 +80,7 @@ def edges_grid_zigzag(dimension):
                 else:
                     edges.append((t, t + dimension))
         else:
-            for x in range(dimension):
+            for x in range(0, dimension-1):
                 t = x + mod
                 edges.append((t, t + 1))
     return edges

@@ -33,9 +33,9 @@ class VlanderWorldProperties(PropertyGroup):
     resolution: IntProperty(
         name="resolution",
         description="Vlander Resolution",
-        default=4,
+        default=1,
         max=32,
-        min=4
+        min=1
     )
     created: BoolProperty(
         name="created",
