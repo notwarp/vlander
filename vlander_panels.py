@@ -12,6 +12,7 @@ from . import icons
 
 def draw_vlander_settings(context, layout):
     if context.area.type == 'PROPERTIES':
+        layout.prop(context.scene.world.vlander, 'space')
         layout.prop(context.scene.world.vlander, 'dimension')
         layout.prop(context.scene.world.vlander, 'resolution')
 
@@ -105,6 +106,7 @@ def unregister_panels():
     from bpy.utils import (
         unregister_class, unregister_tool
     )
+
     for c in reversed(classes):
         unregister_class(c)
     unregister_tool(Vlander)

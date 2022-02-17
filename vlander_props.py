@@ -30,12 +30,21 @@ class VlanderWorldProperties(PropertyGroup):
         min=6,
         update=draw.update_vlander_creation
     )
+    space: IntProperty(
+        name="space",
+        description="Vlander Space",
+        default=1,
+        max=100,
+        min=1,
+        update=draw.update_vlander_creation
+    )
     resolution: IntProperty(
         name="resolution",
         description="Vlander Resolution",
         default=1,
         max=32,
-        min=1
+        min=1,
+        update=draw.update_vlander_creation
     )
     created: BoolProperty(
         name="created",
@@ -53,6 +62,7 @@ classes = [
 def register_props():
     from bpy.utils import register_class
     from bpy.props import PointerProperty
+
     for c in classes:
         register_class(c)
     World.vlander = PointerProperty(type=VlanderWorldProperties)

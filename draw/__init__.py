@@ -23,9 +23,11 @@ edges = None
 
 def setup_draw(context):
     global shader_points, shader_edges, shader_faces, coords, batch_points, edges, batch_edges, faces, batch_faces
-    coords = square_grid_zigzag(context.scene.world.vlander.dimension + 1, context.scene.world.vlander.resolution)
-    edges = edges_grid_zigzag(context.scene.world.vlander.dimension + 1)
-    faces = faces_grid_zigzag(context.scene.world.vlander.dimension + 1)
+    coords = square_grid_zigzag(context.scene.world.vlander.dimension + 1,
+                                context.scene.world.vlander.resolution,
+                                context.scene.world.vlander.space)
+    edges = edges_grid_zigzag(context.scene.world.vlander.dimension + 1, context.scene.world.vlander.resolution)
+    faces = faces_grid_zigzag(context.scene.world.vlander.dimension + 1, context.scene.world.vlander.resolution)
     shader_points = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
     batch_points = batch_for_shader(
         shader_points,

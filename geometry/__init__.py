@@ -14,12 +14,12 @@ def square_grid_diagonal(dimension):
     return coordinates
 
 
-def square_grid_zigzag(dimension, resolution):
+def square_grid_zigzag(dimension, resolution, space):
     coords = []
-    distance = 10
-    offset = (dimension / 2 - 0.5) * distance
-    for x in range(dimension):
-        for j in range(dimension):
+    distance = 10 / resolution * space
+    offset = ((dimension / (2 * resolution) - 0.5) * distance) * space
+    for x in range(dimension * resolution):
+        for j in range(dimension * resolution):
             coords.append((j * distance - offset, x * distance - offset, random.randrange(0, 3)))
     return coords
 
@@ -58,8 +58,9 @@ def edges_grid_diagonal(dimension):
     return edges
 
 
-def edges_grid_zigzag(dimension):
+def edges_grid_zigzag(dimension, resolution):
     edges = []
+    dimension = dimension * resolution
     for y in range(dimension):
         mod = y * dimension
         if y == 0:
@@ -86,13 +87,14 @@ def edges_grid_zigzag(dimension):
     return edges
 
 
-def faces_grid_zigzag(dimension):
+def faces_grid_zigzag(dimension, resolution):
     faces = []
     # for x in range(dimension):
     #     if x < dimension-1:
     #         faces.append((x, x + 1, x + dimension + 1))
     #         faces.append((x, x + dimension + 1, x + dimension))
     # test = []
+    dimension = dimension * resolution
     for y in range(dimension):
         mod = y * dimension
         if y == 0:
