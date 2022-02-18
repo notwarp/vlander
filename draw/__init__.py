@@ -22,14 +22,13 @@ edges = None
 
 vert_shdr = '''
     uniform mat4 ModelViewProjectionMatrix;
-    uniform mat4 ModelViewMatrix;
     #ifdef USE_WORLD_CLIP_PLANES
         uniform mat4 ModelMatrix;
     #endif
     in vec3 pos;
     void main()
     {
-        gl_Position = ModelViewProjectionMatrix * ModelViewMatrix * vec4(pos, 0.5);
+        gl_Position = ModelViewProjectionMatrix * vec4(pos, 1.0);
         #ifdef USE_WORLD_CLIP_PLANES
             world_clip_planes_calc_clip_distance((ModelMatrix * vec4(pos, 1.0)).xyz);
         #endif
@@ -72,7 +71,7 @@ custom_frag_shdr = '''
     }
     
     void main() {
-        vec2 st = gl_FragCoord.xy  * resolution.xy;
+        vec2 st = gl_FragCoord.xy / (100,100);
         st.x *= resolution.x / resolution.y;
         st *= 10.0;
     
