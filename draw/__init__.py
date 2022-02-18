@@ -144,7 +144,7 @@ def draw_callback_px(self, context):
         shader_edges.uniform_float("color", (1, 1, 1, .2))
         batch_edges.draw(shader_edges)
         shader_faces.bind()
-        shader_faces.uniform_float("color", (0, 1, 0, .2))
+        shader_faces.uniform_float("color", (0, 1, 0, .1))
         shader_faces.bind()
         shader_faces.uniform_float("resolution", (
             context.scene.world.vlander.resolution * context.scene.world.vlander.dimension,
