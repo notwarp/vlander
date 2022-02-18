@@ -70,6 +70,7 @@ def register_props():
 def unregister_props():
     from bpy.utils import unregister_class
     from bpy.types import World
+
     for c in reversed(classes):
         unregister_class(c)
     del World.vlander
