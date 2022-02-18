@@ -17,7 +17,7 @@ def square_grid_diagonal(dimension):
 def square_grid_zigzag(dimension, resolution, space):
     coords = []
     distance = 10 / resolution * space
-    offset = ((dimension / (2 * resolution) - 0.5) * distance) * space
+    offset = (dimension / 2 - 0.5) * distance * resolution
     for x in range(dimension * resolution):
         for j in range(dimension * resolution):
             coords.append((j * distance - offset, x * distance - offset, random.randrange(0, 3)))

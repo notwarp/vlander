@@ -62,7 +62,6 @@ classes = [
 def register_props():
     from bpy.utils import register_class
     from bpy.props import PointerProperty
-
     for c in classes:
         register_class(c)
     World.vlander = PointerProperty(type=VlanderWorldProperties)
