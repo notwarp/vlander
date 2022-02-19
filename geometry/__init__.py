@@ -28,22 +28,41 @@ def square_grid_zigzag(dimension, resolution, space):
 def poi_from_coords_zigzag(coords, dimension, resolution):
     _coords = []
     size = dimension * resolution
-    for x in range(dimension * resolution):
-        for j in range(dimension * resolution):
-            if x == 0:
-                prev = coords[x + j]
-                _coords.append((
-                    prev[0] - ((prev[0] - coords[x + j + 1][0]) / 2),
-                    prev[1] - ((prev[1] - coords[x + j + size + 1][1]) / 2),
-                    .5
-                ))
+    if resolution > 1:
+        size = size + resolution - 1
+    for x in range(size):
+        for j in range(size):
+            if resolution == 1:
+                if x == 0:
+                    prev = coords[x + j]
+                    _coords.append((
+                        prev[0] - ((prev[0] - coords[x + j + 1][0]) / 2),
+                        prev[1] - ((prev[1] - coords[x + j + size + 1][1]) / 2),
+                        .5
+                    ))
+                else:
+                    prev = coords[x * (dimension+1) + j]
+                    _coords.append((
+                        prev[0] - ((prev[0] - coords[x * (dimension+1) + j + 1][0]) / 2),
+                        prev[1] - ((prev[1] - coords[x * (dimension+1) + j + size + 1][1]) / 2),
+                        .5
+                    ))
             else:
-                prev = coords[x * (dimension+1) + j]
-                _coords.append((
-                    prev[0] - ((prev[0] - coords[x * (dimension+1) + j + 1][0]) / 2),
-                    prev[1] - ((prev[1] - coords[x * (dimension+1) + j + size + 1][1]) / 2),
-                    .5
-                ))
+                if x == 0:
+                    pass
+                    prev = coords[x + j]
+                    _coords.append((
+                        prev[0] - ((prev[0] - coords[x + j + 1][0]) / 2),
+                        prev[1] - ((prev[1] - coords[x + j + size + resolution][1]) / 2),
+                        .5
+                    ))
+                else:
+                    prev = coords[x * (size + 1) + j]
+                    _coords.append((
+                        prev[0] - ((prev[0] - coords[x * (size + 1) + j + 1][0]) / 2),
+                        prev[1] - ((prev[1] - coords[x * (size + 1) + j + size + 2][1]) / 2),
+                        .5
+                    ))
     return _coords
 
 
