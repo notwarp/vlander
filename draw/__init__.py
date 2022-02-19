@@ -22,6 +22,7 @@ edges = None
 
 vert_shdr = '''
     uniform mat4 ModelViewProjectionMatrix;
+    //uniform mat4 ModelViewMatrixInverse;
     #ifdef USE_WORLD_CLIP_PLANES
         uniform mat4 ModelMatrix;
     #endif
@@ -29,6 +30,7 @@ vert_shdr = '''
     void main()
     {
         gl_Position = ModelViewProjectionMatrix * vec4(pos, 1.0);
+        //gl_Position = ModelViewMatrixInverse * gl_Position;
         #ifdef USE_WORLD_CLIP_PLANES
             world_clip_planes_calc_clip_distance((ModelMatrix * vec4(pos, 1.0)).xyz);
         #endif
@@ -42,7 +44,8 @@ custom_frag_shdr = '''
         uniform uint resolution;
     #else
         uniform vec4 color;
-        uniform vec4 resolution;
+        // uniform vec4 resolution;
+        uniform vec2 u_resolution;
     #endif
     
     out vec4 fragColor;
@@ -71,12 +74,12 @@ custom_frag_shdr = '''
     }
     
     void main() {
-        vec2 st = gl_FragCoord.xy / (100,100);
-        st.x *= resolution.x / resolution.y;
+        vec2 st = gl_FragCoord.xy / u_resolution.xy;
+        st.x *= u_resolution.x / u_resolution.y;
         st *= 10.0;
     
         float v = cellular(st);
-        fragColor = vec4(vec3(v),color.a);
+        fragColor = vec4(vec3(v)*(0,0,1),color.a);
         fragColor = blender_srgb_to_framebuffer_space(fragColor);
     }
 '''
@@ -116,8 +119,8 @@ def setup_draw(context):
         'POINTS',
         {"pos": coords}
     )
-    # shader_faces = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-    shader_faces = gpu.types.GPUShader(vert_shdr, custom_frag_shdr)
+    shader_faces = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+    # shader_faces = gpu.types.GPUShader(vert_shdr, custom_frag_shdr)
     batch_faces = batch_for_shader(
         shader_faces,
         'TRIS',
@@ -144,11 +147,13 @@ def draw_callback_px(self, context):
         shader_edges.uniform_float("color", (1, 1, 1, .2))
         batch_edges.draw(shader_edges)
         shader_faces.bind()
-        shader_faces.uniform_float("color", (0, 1, 0, .1))
-        shader_faces.bind()
-        shader_faces.uniform_float("resolution", (
-            context.scene.world.vlander.resolution * context.scene.world.vlander.dimension,
-            context.scene.world.vlander.resolution * context.scene.world.vlander.dimension, 0, 0))
+        shader_faces.uniform_float("color", (0, 1, 0, .3))
+        # shader_faces.bind()
+        # shader_faces.uniform_float("u_resolution", (
+        #         context.scene.world.vlander.resolution / context.scene.world.vlander.dimension,
+        #         context.scene.world.vlander.resolution / context.scene.world.vlander.dimension
+        #     )
+        # )
         batch_faces.draw(shader_faces)
 
 

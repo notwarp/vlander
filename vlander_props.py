@@ -42,7 +42,7 @@ class VlanderWorldProperties(PropertyGroup):
         name="resolution",
         description="Vlander Resolution",
         default=1,
-        max=32,
+        max=5,
         min=1,
         update=draw.update_vlander_creation
     )
