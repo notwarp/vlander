@@ -9,7 +9,7 @@
 
 ## Screenshots
 
-![Example](screenshots/1.png "Example")
+![Example](screenshots/viewport.png "Example")
 ![Example](screenshots/2.png "Example")
 
 ## Built With
