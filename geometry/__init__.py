@@ -20,8 +20,31 @@ def square_grid_zigzag(dimension, resolution, space):
     offset = (dimension / 2 - (0.5 / resolution)) * distance * resolution
     for x in range(dimension * resolution):
         for j in range(dimension * resolution):
-            coords.append((j * distance - offset, x * distance - offset, random.randrange(0, 3)))
+            # coords.append((j * distance - offset, x * distance - offset, random.randrange(0, 0)))
+            coords.append((j * distance - offset, x * distance - offset, 0))
     return coords
+
+
+def poi_from_coords_zigzag(coords, dimension, resolution):
+    _coords = []
+    size = dimension * resolution
+    for x in range(dimension * resolution):
+        for j in range(dimension * resolution):
+            if x == 0:
+                prev = coords[x + j]
+                _coords.append((
+                    prev[0] - ((prev[0] - coords[x + j + 1][0]) / 2),
+                    prev[1] - ((prev[1] - coords[x + j + size + 1][1]) / 2),
+                    .5
+                ))
+            else:
+                prev = coords[x * (dimension+1) + j]
+                _coords.append((
+                    prev[0] - ((prev[0] - coords[x * (dimension+1) + j + 1][0]) / 2),
+                    prev[1] - ((prev[1] - coords[x * (dimension+1) + j + size + 1][1]) / 2),
+                    .5
+                ))
+    return _coords
 
 
 def edges_grid_diagonal(dimension):
@@ -89,11 +112,6 @@ def edges_grid_zigzag(dimension, resolution):
 
 def faces_grid_zigzag(dimension, resolution):
     faces = []
-    # for x in range(dimension):
-    #     if x < dimension-1:
-    #         faces.append((x, x + 1, x + dimension + 1))
-    #         faces.append((x, x + dimension + 1, x + dimension))
-    # test = []
     dimension = dimension * resolution
     for y in range(dimension):
         mod = y * dimension

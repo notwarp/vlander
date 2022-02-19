@@ -6,6 +6,7 @@ from bpy.types import PropertyGroup
 from bpy.props import (
     BoolProperty, IntProperty, CollectionProperty
 )
+
 from . import draw
 from bpy.types import World
 
@@ -62,6 +63,7 @@ classes = [
 def register_props():
     from bpy.utils import register_class
     from bpy.props import PointerProperty
+
     for c in classes:
         register_class(c)
     World.vlander = PointerProperty(type=VlanderWorldProperties)
@@ -70,7 +72,6 @@ def register_props():
 def unregister_props():
     from bpy.utils import unregister_class
     from bpy.types import World
-
     for c in reversed(classes):
         unregister_class(c)
     del World.vlander
