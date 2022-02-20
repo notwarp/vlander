@@ -12,9 +12,14 @@ from . import icons
 
 def draw_vlander_settings(context, layout):
     if context.area.type == 'PROPERTIES':
+        layout.label(text='Type of the shape', text_ctxt='', translate=True, icon='NONE', icon_value=0)
+        layout.prop(context.scene.world.vlander, 'types', text='')
+        layout.separator_spacer()
         layout.prop(context.scene.world.vlander, 'space')
         layout.prop(context.scene.world.vlander, 'dimension')
         layout.prop(context.scene.world.vlander, 'resolution')
+        layout.prop(context.scene.world.vlander, 'is_hidden')
+        layout.prop(context.scene.world.vlander, 'only_poi')
 
 
 def draw_vlander_actions(context, col):

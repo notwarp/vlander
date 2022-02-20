@@ -1,8 +1,9 @@
+import math
 import random
 
 
 def square_grid_diagonal(dimension):
-    distance = 10
+    distance = 50
     coordinates = []
     offset = (dimension / 2 - 0.5) * distance
     for x in range(dimension):
@@ -16,12 +17,65 @@ def square_grid_diagonal(dimension):
 
 def square_grid_zigzag(dimension, resolution, space):
     coords = []
-    distance = 10 / resolution * space
+    distance = 50 / resolution * space
     offset = (dimension / 2 - (0.5 / resolution)) * distance * resolution
     for x in range(dimension * resolution):
         for j in range(dimension * resolution):
             # coords.append((j * distance - offset, x * distance - offset, random.randrange(0, 0)))
             coords.append((j * distance - offset, x * distance - offset, 0))
+    return coords
+
+
+def flat_hex_corner(center, size, i):
+    angle_deg = 60 * i
+    angle_rad = math.pi / 180 * angle_deg
+    return center[0] + size * math.cos(angle_rad), center[1] + size * math.sin(angle_rad), 0
+
+
+def pointy_hex_corner(center, size, i):
+    angle_deg = 60 * i + 30
+    angle_rad = math.pi / 180 * angle_deg
+    return center[0] + size * math.cos(angle_rad), center[1] + size * math.sin(angle_rad), 0
+
+
+def hex_grid_zigzag(dimension, resolution, space):
+    coords = []
+    hex_size = 50 / resolution * space
+    three_root = math.sqrt(3)
+    print(three_root)
+    hex_v_h = (2 * hex_size, three_root * (hex_size / 2))
+    counter = 6
+    for x in range(dimension):
+        # CENTER HEXAGON
+        if x == 0:
+            # MIDDLE POINT
+            coords.append((0, 0, 0))
+            for i in range(6):
+                # 6 POINTS AROUND CENTER
+                coords.append(flat_hex_corner((0, 0, 0), hex_size, i))
+        else:
+            middle_points = []
+            for j in range(6):
+                middle_points.append(pointy_hex_corner((0, 0, 0), hex_size * three_root * x, j))
+            for i in middle_points:
+                coords.append(i)
+                for h in range(6):
+                    coords.append(flat_hex_corner(i, hex_size, h))
+            if 1 < x < dimension - 1:
+                middle_points = []
+                for j in range(6):
+                    middle_points.append(flat_hex_corner((0, 0, 0), hex_size * 2 * x, j))
+                for i in middle_points:
+                    coords.append(i)
+                    for h in range(6):
+                        coords.append(flat_hex_corner(i, hex_size, h))
+
+        # center = (snaz[0] * (3/4) * x, snaz[1] * x)
+        # if x > 0:
+        #     counter = 2
+        # for i in range(counter):
+        #     coords.append(flat_hex_corner(center, distance, i))
+        # coords.append((center[0], center[1], 0))
     return coords
 
 
@@ -67,7 +121,7 @@ def poi_from_coords_zigzag(coords, dimension, resolution):
 
 
 def edges_grid_diagonal(dimension):
-    distance = 10
+    distance = 50
     edges = []
     odd_nums = get_odd_numbers([x for x in range(dimension * dimension)])
     for x in range(dimension - 1):

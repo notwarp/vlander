@@ -4,11 +4,27 @@
 # ----------------------------------------------------------
 from bpy.types import PropertyGroup
 from bpy.props import (
-    BoolProperty, IntProperty, CollectionProperty
+    BoolProperty, IntProperty, EnumProperty
 )
 
 from . import draw
 from bpy.types import World
+
+
+def get_types_of_vlander(self, context):
+    preferences = context.preferences
+    vlander_experimental = preferences.addons['vlander'].preferences.use_experimental
+    vlander_extra = preferences.addons['vlander'].preferences.use_extra
+    enums = [
+        ('QUAD', 'Quad', "Simple square Vlander type"),
+        ('HEX', 'Hexagonal', "Simple hexagonal Vlander type")
+    ]
+    if vlander_extra:
+        enums.append(('CIRCLE', 'Circle', "Simple circle Vlander type"))
+    if vlander_experimental:
+        enums.append(('CUSTOM', 'Custom', "Custom shape of Vlander type"))
+
+    return enums
 
 
 class VlanderWorldProperties(PropertyGroup):
@@ -51,6 +67,24 @@ class VlanderWorldProperties(PropertyGroup):
         name="created",
         description="Vlander Created",
         default=False,
+        update=draw.update_vlander_creation
+    )
+    is_hidden: BoolProperty(
+        name="debug visualizer",
+        description="Vlander debug visualization",
+        default=False,
+        update=draw.update_vlander_creation
+    )
+    only_poi: BoolProperty(
+        name="show only POI",
+        description="Vlander show only POI",
+        default=False,
+        update=draw.update_vlander_creation
+    )
+    types: EnumProperty(
+        name="type of vlander",
+        description="Select Vlander type",
+        items=get_types_of_vlander,
         update=draw.update_vlander_creation
     )
 

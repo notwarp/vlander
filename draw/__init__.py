@@ -2,14 +2,7 @@ import bpy
 import bgl
 import gpu
 from gpu_extras.batch import batch_for_shader
-from ..geometry import (
-    square_grid_diagonal,
-    edges_grid_diagonal,
-    square_grid_zigzag,
-    edges_grid_zigzag,
-    faces_grid_zigzag,
-    poi_from_coords_zigzag
-)
+from ..geometry import *
 
 shader_points = None
 batch_points = None
@@ -111,7 +104,15 @@ frag_shdr = '''
 '''
 
 
-def setup_draw(context):
+def generate_points(obj, vlander_type):
+    if vlander_type == 'HEX':
+        _points = hex_grid_zigzag(obj.dimension + 1, obj.resolution, obj.space)
+    else:
+        _points = square_grid_zigzag(obj.dimension + 1, obj.resolution, obj.space)
+    return _points
+
+
+def setup_draw(context, vlander_type):
     global shader_points, points, batch_points, \
         shader_edges, edges, batch_edges, \
         shader_faces, faces, batch_faces, \
@@ -119,38 +120,39 @@ def setup_draw(context):
 
     vlander_obj = context.scene.world.vlander
 
-    points = square_grid_zigzag(vlander_obj.dimension + 1, vlander_obj.resolution, vlander_obj.space)
-    shader_points = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-    batch_points = batch_for_shader(
-        shader_points,
-        'POINTS',
-        {"pos": points}
-    )
-
-    faces = faces_grid_zigzag(vlander_obj.dimension + 1, vlander_obj.resolution)
-    shader_faces = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-    # shader_faces = gpu.types.GPUShader(vert_shdr, custom_frag_shdr)
-    batch_faces = batch_for_shader(
-        shader_faces,
-        'TRIS',
-        {"pos": points},
-        indices=faces
-    )
-    edges = edges_grid_zigzag(vlander_obj.dimension + 1, vlander_obj.resolution)
-    shader_edges = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-    batch_edges = batch_for_shader(
-        shader_edges,
-        'LINES',
-        {"pos": points},
-        indices=edges
-    )
-    poi = poi_from_coords_zigzag(points, vlander_obj.dimension, vlander_obj.resolution)
-    shader_poi = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-    batch_poi = batch_for_shader(
-        shader_poi,
-        'POINTS',
-        {"pos": poi}
-    )
+    points = generate_points(vlander_obj, vlander_type)
+    # poi = poi_from_coords_zigzag(points, vlander_obj.dimension, vlander_obj.resolution)
+    if vlander_obj.is_hidden:
+        shader_points = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+        batch_points = batch_for_shader(
+            shader_points,
+            'POINTS',
+            {"pos": points}
+        )
+    #     faces = faces_grid_zigzag(vlander_obj.dimension + 1, vlander_obj.resolution)
+    #     shader_faces = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+    #     # shader_faces = gpu.types.GPUShader(vert_shdr, custom_frag_shdr)
+    #     batch_faces = batch_for_shader(
+    #         shader_faces,
+    #         'TRIS',
+    #         {"pos": points},
+    #         indices=faces
+    #     )
+    #     edges = edges_grid_zigzag(vlander_obj.dimension + 1, vlander_obj.resolution)
+    #     shader_edges = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+    #     batch_edges = batch_for_shader(
+    #         shader_edges,
+    #         'LINES',
+    #         {"pos": points},
+    #         indices=edges
+    #     )
+    # if vlander_obj.only_poi:
+    #     shader_poi = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+    #     batch_poi = batch_for_shader(
+    #         shader_poi,
+    #         'POINTS',
+    #         {"pos": poi}
+    #     )
 
 
 def draw_callback_px(self, context):
@@ -159,30 +161,33 @@ def draw_callback_px(self, context):
             shader_edges, edges, batch_edges, \
             shader_faces, faces, batch_faces, \
             shader_poi, poi, batch_poi
-
-        bgl.glEnable(bgl.GL_BLEND)
-        # POINTS
-        shader_points.bind()
-        shader_points.uniform_float("color", (.5, 1, 0, 1))
-        batch_points.draw(shader_points)
-        # EDGES
-        shader_edges.bind()
-        shader_edges.uniform_float("color", (1, 1, 1, .2))
-        batch_edges.draw(shader_edges)
-        # FACES
-        shader_faces.bind()
-        shader_faces.uniform_float("color", (0, 1, 0, .3))
-        # shader_faces.bind()
-        # shader_faces.uniform_float("u_resolution", (
-        #         context.scene.world.vlander.resolution / context.scene.world.vlander.dimension,
-        #         context.scene.world.vlander.resolution / context.scene.world.vlander.dimension
-        #     )
-        # )
-        batch_faces.draw(shader_faces)
-        # MIDDLE POINTS
-        shader_poi.bind()
-        shader_poi.uniform_float("color", (1, 0, .5, 1))
-        batch_poi.draw(shader_poi)
+        vlander_obj = context.scene.world.vlander
+        if vlander_obj.is_hidden:
+            bgl.glEnable(bgl.GL_BLEND)
+            # POINTS
+            shader_points.bind()
+            shader_points.uniform_float("color", (.5, 1, 0, 1))
+            batch_points.draw(shader_points)
+            # # EDGES
+            # shader_edges.bind()
+            # shader_edges.uniform_float("color", (1, 1, 1, .2))
+            # batch_edges.draw(shader_edges)
+            # # FACES
+            # shader_faces.bind()
+            # shader_faces.uniform_float("color", (0, 1, 0, .3))
+            # # shader_faces.bind()
+            # # shader_faces.uniform_float("u_resolution", (
+            # #         context.scene.world.vlander.resolution / context.scene.world.vlander.dimension,
+            # #         context.scene.world.vlander.resolution / context.scene.world.vlander.dimension
+            # #     )
+            # # )
+            # batch_faces.draw(shader_faces)
+            # # MIDDLE POINTS
+        # if vlander_obj.only_poi:
+        #     bgl.glEnable(bgl.GL_BLEND)
+        #     shader_poi.bind()
+        #     shader_poi.uniform_float("color", (1, 0, .5, 1))
+        #     batch_poi.draw(shader_poi)
 
 
 draw_handler = False
@@ -190,14 +195,14 @@ draw_handler = False
 
 def update_vlander_activation(self, context):
     if self.is_active:
-        setup_draw(context)
+        setup_draw(context, self.types)
         add_handler(self, context)
     else:
         remove_handler(self, context)
 
 
 def update_vlander_creation(self, context):
-    setup_draw(context)
+    setup_draw(context, self.types)
     context.area.tag_redraw()
 
 
