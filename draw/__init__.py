@@ -21,8 +21,10 @@ poi = None
 vert_shdr = '''
     uniform mat4 modelMatrix;
     uniform mat4 viewProjectionMatrix;
+    
     in vec3 pos;
     in vec2 uv;
+    
     out vec2 uvInterp;
     void main()
     {
@@ -72,7 +74,7 @@ custom_frag_shdr = '''
         st.x *= uvInterp.x / uvInterp.y;
         st *= 10.0;
     
-        float v = cellular(st);
+        float v = cellular(uvInterp.xy);
         fragColor = vec4(vec3(v),color.a);
         fragColor = blender_srgb_to_framebuffer_space(fragColor);
     }
