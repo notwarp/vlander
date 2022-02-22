@@ -18,15 +18,14 @@ edges = None
 poi = None
 
 vert_shdr = '''
-    uniform mat4 ModelViewProjectionMatrix;
-    //uniform mat4 ModelViewMatrixInverse;
+    uniform mat4 viewProjectionMatrix;
     #ifdef USE_WORLD_CLIP_PLANES
         uniform mat4 ModelMatrix;
     #endif
     in vec3 pos;
     void main()
     {
-        gl_Position = ModelViewProjectionMatrix * vec4(pos, 1.0);
+        gl_Position = viewProjectionMatrix * vec4(pos, 1.0);
         //gl_Position = ModelViewMatrixInverse * gl_Position;
         #ifdef USE_WORLD_CLIP_PLANES
             world_clip_planes_calc_clip_distance((ModelMatrix * vec4(pos, 1.0)).xyz);
@@ -71,7 +70,7 @@ custom_frag_shdr = '''
     }
     
     void main() {
-        vec2 st = gl_FragCoord.xy / u_resolution.xy;
+        vec2 st = gl_FragCoord.xy / (100,100);
         st.x *= u_resolution.x / u_resolution.y;
         st *= 10.0;
     
@@ -121,7 +120,7 @@ def setup_draw(context, vlander_type):
     vlander_obj = context.scene.world.vlander
 
     points = generate_points(vlander_obj, vlander_type)
-    # poi = poi_from_coords_zigzag(points, vlander_obj.dimension, vlander_obj.resolution)
+    poi = poi_from_coords_zigzag(points, vlander_obj.dimension, vlander_obj.resolution)
     if vlander_obj.is_hidden:
         shader_points = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
         batch_points = batch_for_shader(
@@ -129,30 +128,30 @@ def setup_draw(context, vlander_type):
             'POINTS',
             {"pos": points}
         )
-    #     faces = faces_grid_zigzag(vlander_obj.dimension + 1, vlander_obj.resolution)
-    #     shader_faces = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-    #     # shader_faces = gpu.types.GPUShader(vert_shdr, custom_frag_shdr)
-    #     batch_faces = batch_for_shader(
-    #         shader_faces,
-    #         'TRIS',
-    #         {"pos": points},
-    #         indices=faces
-    #     )
-    #     edges = edges_grid_zigzag(vlander_obj.dimension + 1, vlander_obj.resolution)
-    #     shader_edges = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-    #     batch_edges = batch_for_shader(
-    #         shader_edges,
-    #         'LINES',
-    #         {"pos": points},
-    #         indices=edges
-    #     )
-    # if vlander_obj.only_poi:
-    #     shader_poi = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
-    #     batch_poi = batch_for_shader(
-    #         shader_poi,
-    #         'POINTS',
-    #         {"pos": poi}
-    #     )
+        faces = faces_grid_zigzag(vlander_obj.dimension + 1, vlander_obj.resolution)
+        # shader_faces = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+        shader_faces = gpu.types.GPUShader(vert_shdr, custom_frag_shdr)
+        batch_faces = batch_for_shader(
+            shader_faces,
+            'TRIS',
+            {"pos": points},
+            indices=faces
+        )
+        edges = edges_grid_zigzag(vlander_obj.dimension + 1, vlander_obj.resolution)
+        shader_edges = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+        batch_edges = batch_for_shader(
+            shader_edges,
+            'LINES',
+            {"pos": points},
+            indices=edges
+        )
+    if vlander_obj.only_poi:
+        shader_poi = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
+        batch_poi = batch_for_shader(
+            shader_poi,
+            'POINTS',
+            {"pos": poi}
+        )
 
 
 def draw_callback_px(self, context):
@@ -168,26 +167,28 @@ def draw_callback_px(self, context):
             shader_points.bind()
             shader_points.uniform_float("color", (.5, 1, 0, 1))
             batch_points.draw(shader_points)
-            # # EDGES
-            # shader_edges.bind()
-            # shader_edges.uniform_float("color", (1, 1, 1, .2))
-            # batch_edges.draw(shader_edges)
-            # # FACES
+            # EDGES
+            shader_edges.bind()
+            shader_edges.uniform_float("color", (1, 1, 1, .2))
+            batch_edges.draw(shader_edges)
+            # FACES
             # shader_faces.bind()
-            # shader_faces.uniform_float("color", (0, 1, 0, .3))
-            # # shader_faces.bind()
-            # # shader_faces.uniform_float("u_resolution", (
-            # #         context.scene.world.vlander.resolution / context.scene.world.vlander.dimension,
-            # #         context.scene.world.vlander.resolution / context.scene.world.vlander.dimension
-            # #     )
-            # # )
-            # batch_faces.draw(shader_faces)
-            # # MIDDLE POINTS
-        # if vlander_obj.only_poi:
-        #     bgl.glEnable(bgl.GL_BLEND)
-        #     shader_poi.bind()
-        #     shader_poi.uniform_float("color", (1, 0, .5, 1))
-        #     batch_poi.draw(shader_poi)
+            shader_faces.bind()
+            shader_faces.uniform_float("color", (0, 1, 0, .3))
+            shader_faces.uniform_float("u_resolution", (
+                    context.scene.world.vlander.dimension,
+                    context.scene.world.vlander.dimension
+                )
+            )
+
+            shader_faces.uniform_float("viewProjectionMatrix", context.region_data.perspective_matrix)
+            batch_faces.draw(shader_faces)
+        if vlander_obj.only_poi:
+            # MIDDLE POINTS
+            bgl.glEnable(bgl.GL_BLEND)
+            shader_poi.bind()
+            shader_poi.uniform_float("color", (1, 0, .5, 1))
+            batch_poi.draw(shader_poi)
 
 
 draw_handler = False
