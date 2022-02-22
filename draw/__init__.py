@@ -70,10 +70,6 @@ custom_frag_shdr = '''
     }
     
     void main() {
-        vec2 st = gl_FragCoord.xy / uvInterp.xy;
-        st.x *= uvInterp.x / uvInterp.y;
-        st *= 10.0;
-    
         float v = cellular(uvInterp.xy);
         fragColor = vec4(vec3(v),color.a);
         fragColor = blender_srgb_to_framebuffer_space(fragColor);
