@@ -26,6 +26,13 @@ def square_grid_zigzag(dimension, resolution, space):
     return coords
 
 
+def calculate_uv_from_coords(points):
+    _uvs = []
+    for x in points:
+        _uvs.append((x[0], x[1]))
+    return _uvs
+
+
 def flat_hex_corner(center, size, i):
     angle_deg = 60 * i
     angle_rad = math.pi / 180 * angle_deg

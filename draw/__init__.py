@@ -1,6 +1,7 @@
 import bpy
 import bgl
 import gpu
+from mathutils import Matrix
 from gpu_extras.batch import batch_for_shader
 from ..geometry import *
 
@@ -18,18 +19,15 @@ edges = None
 poi = None
 
 vert_shdr = '''
+    uniform mat4 modelMatrix;
     uniform mat4 viewProjectionMatrix;
-    #ifdef USE_WORLD_CLIP_PLANES
-        uniform mat4 ModelMatrix;
-    #endif
     in vec3 pos;
+    in vec2 uv;
+    out vec2 uvInterp;
     void main()
     {
-        gl_Position = viewProjectionMatrix * vec4(pos, 1.0);
-        //gl_Position = ModelViewMatrixInverse * gl_Position;
-        #ifdef USE_WORLD_CLIP_PLANES
-            world_clip_planes_calc_clip_distance((ModelMatrix * vec4(pos, 1.0)).xyz);
-        #endif
+        uvInterp = uv;
+        gl_Position = viewProjectionMatrix * modelMatrix * vec4(pos, 1.0);
     }
 '''
 
@@ -43,7 +41,7 @@ custom_frag_shdr = '''
         // uniform vec4 resolution;
         uniform vec2 u_resolution;
     #endif
-    
+    in vec2 uvInterp;
     out vec4 fragColor;
     
     vec2 random2(vec2 p) {
@@ -70,12 +68,12 @@ custom_frag_shdr = '''
     }
     
     void main() {
-        vec2 st = gl_FragCoord.xy / (100,100);
-        st.x *= u_resolution.x / u_resolution.y;
+        vec2 st = gl_FragCoord.xy / uvInterp.xy;
+        st.x *= uvInterp.x / uvInterp.y;
         st *= 10.0;
     
         float v = cellular(st);
-        fragColor = vec4(vec3(v)*(0,0,1),color.a);
+        fragColor = vec4(vec3(v),color.a);
         fragColor = blender_srgb_to_framebuffer_space(fragColor);
     }
 '''
@@ -111,6 +109,15 @@ def generate_points(obj, vlander_type):
     return _points
 
 
+def generate_uv_from_points(coords, obj, vlander_type):
+    _uvs = calculate_uv_from_coords(coords)
+    # if vlander_type == 'HEX':
+    #     _uvs = hex_uv_zigzag(obj.dimension + 1, obj.resolution, obj.space)
+    # else:
+    #     _uvs = square_grid_zigzag(obj.dimension + 1, obj.resolution, obj.space)
+    return _uvs
+
+
 def setup_draw(context, vlander_type):
     global shader_points, points, batch_points, \
         shader_edges, edges, batch_edges, \
@@ -120,6 +127,7 @@ def setup_draw(context, vlander_type):
     vlander_obj = context.scene.world.vlander
 
     points = generate_points(vlander_obj, vlander_type)
+    uvs = generate_uv_from_points(points, vlander_obj, vlander_type)
     poi = poi_from_coords_zigzag(points, vlander_obj.dimension, vlander_obj.resolution)
     if vlander_obj.is_hidden:
         shader_points = gpu.shader.from_builtin('3D_UNIFORM_COLOR')
@@ -134,7 +142,10 @@ def setup_draw(context, vlander_type):
         batch_faces = batch_for_shader(
             shader_faces,
             'TRIS',
-            {"pos": points},
+            {
+                "pos": points,
+                "uv": uvs
+            },
             indices=faces
         )
         edges = edges_grid_zigzag(vlander_obj.dimension + 1, vlander_obj.resolution)
@@ -175,12 +186,12 @@ def draw_callback_px(self, context):
             # shader_faces.bind()
             shader_faces.bind()
             shader_faces.uniform_float("color", (0, 1, 0, .3))
-            shader_faces.uniform_float("u_resolution", (
-                    context.scene.world.vlander.dimension,
-                    context.scene.world.vlander.dimension
-                )
-            )
-
+            # shader_faces.uniform_float("u_resolution", (
+            #         context.scene.world.vlander.dimension,
+            #         context.scene.world.vlander.dimension
+            #     )
+            # )
+            shader_faces.uniform_float("modelMatrix", Matrix.Translation((1, 2, 3)) @ Matrix.Scale(3, 4))
             shader_faces.uniform_float("viewProjectionMatrix", context.region_data.perspective_matrix)
             batch_faces.draw(shader_faces)
         if vlander_obj.only_poi:
