@@ -19,7 +19,6 @@ edges = None
 poi = None
 
 vert_shdr = '''
-    uniform mat4 modelMatrix;
     uniform mat4 viewProjectionMatrix;
     
     in vec3 pos;
@@ -29,7 +28,7 @@ vert_shdr = '''
     void main()
     {
         uvInterp = uv;
-        gl_Position = viewProjectionMatrix * modelMatrix * vec4(pos, 1.0);
+        gl_Position = viewProjectionMatrix * vec4(pos, 1.0);
     }
 '''
 
@@ -189,7 +188,7 @@ def draw_callback_px(self, context):
             #         context.scene.world.vlander.dimension
             #     )
             # )
-            shader_faces.uniform_float("modelMatrix", Matrix.Translation((1, 2, 3)) @ Matrix.Scale(3, 4))
+            # shader_faces.uniform_float("modelMatrix", Matrix.Translation((1, 2, 3)) @ Matrix.Scale(3, 4))
             shader_faces.uniform_float("viewProjectionMatrix", context.region_data.perspective_matrix)
             batch_faces.draw(shader_faces)
         if vlander_obj.only_poi:
